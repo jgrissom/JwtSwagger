@@ -40,6 +40,21 @@ namespace JWTSwagger.Controllers
         Email = u.Email, 
         UserName = u.UserName 
       }).OrderBy(u => u.UserName));
+    
+    [HttpGet("{username}")]
+    [SwaggerOperation(summary: "Return specific user & associated roles", null)]
+    [SwaggerResponse(200, "Success", typeof(UserRolesDTO))]
+    public async Task<IActionResult> Get(String username)
+    {
+      // check for existence of user
+      var user = await _userManager.FindByNameAsync(username);
+      if (user == null) 
+        return StatusCode(StatusCodes.Status404NotFound);
+
+      var userRoles = (await _userManager.GetRolesAsync(user)).ToList();
+
+      return Ok(new UserRolesDTO {Id = user.Id, UserName = user.UserName, Email = user.Email, Roles = userRoles});
+    }
 
     [HttpPost]
     [Route("register")]
