@@ -4,6 +4,7 @@ using JWTSwagger.Authentication;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using System;
+using System.Linq;
 
 namespace JWTSwagger.Controllers
 {
@@ -19,7 +20,12 @@ namespace JWTSwagger.Controllers
      }
 
     [HttpGet]
-    public IActionResult Get() => Ok(_userManager.Users);
+    public IActionResult Get() => Ok(_userManager.Users.Select(u => 
+      new UserDTO { 
+        Id = u.Id, 
+        Email = u.Email, 
+        UserName = u.UserName 
+      }).OrderBy(u => u.UserName));
 
     [HttpPost]
     [Route("register")]
