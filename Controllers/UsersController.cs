@@ -57,5 +57,24 @@ namespace JWTSwagger.Controllers
 
       return NoContent();
     }
+
+    [HttpPost]
+    [Route("resetpassword")]
+    [SwaggerOperation(summary: "Reset user password", null)]
+    [SwaggerResponse(204, "User password reset", null)]
+    public async Task<IActionResult> ResetPassword([FromBody] UserLogin model)
+    {
+      // check for existence of user
+      var user = await _userManager.FindByNameAsync(model.Username);
+      if (user == null) 
+        return NotFound(new { Message = "User Not Found"});
+
+      string resetToken = await _userManager.GeneratePasswordResetTokenAsync(user);
+      var result = await _userManager.ResetPasswordAsync(user, resetToken, model.Password);
+      if (!result.Succeeded)
+        return StatusCode(StatusCodes.Status500InternalServerError, new { Message = "Password not reset" });
+
+      return NoContent();
+    }
   }
 }
