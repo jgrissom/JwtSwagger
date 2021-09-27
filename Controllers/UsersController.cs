@@ -76,5 +76,22 @@ namespace JWTSwagger.Controllers
 
       return NoContent();
     }
+
+    [HttpDelete("{username}")]
+    [SwaggerOperation(summary: "Delete user", null)]
+    [SwaggerResponse(204, "User deleted", null)]
+    public async Task<IActionResult> Delete(string username)
+    {
+      // check for existence of user
+      var user = await _userManager.FindByNameAsync(username);
+      if (user == null)
+        return NotFound(new { Message = "User Not Found"});
+
+      var result = await _userManager.DeleteAsync(user);
+      if (!result.Succeeded)
+        return StatusCode(StatusCodes.Status500InternalServerError, new { Message = "User not deleted" });
+
+      return NoContent();
+    }
   }
 }
