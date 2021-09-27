@@ -5,9 +5,11 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using System;
 using System.Linq;
+using Swashbuckle.AspNetCore.Annotations;
 
 namespace JWTSwagger.Controllers
 {
+  [Produces("application/json")]
   [Route("api/[controller]")]
   [ApiController]
   public class UsersController : ControllerBase
@@ -20,6 +22,8 @@ namespace JWTSwagger.Controllers
      }
 
     [HttpGet]
+    [SwaggerOperation(summary: "Return all users", null)]
+    [SwaggerResponse(200, "Success", typeof(UserDTO))]
     public IActionResult Get() => Ok(_userManager.Users.Select(u => 
       new UserDTO { 
         Id = u.Id, 
@@ -29,6 +33,8 @@ namespace JWTSwagger.Controllers
 
     [HttpPost]
     [Route("register")]
+    [SwaggerOperation(summary: "User registration", null)]
+    [SwaggerResponse(204, "User registered", null)]
     public async Task<IActionResult> Register([FromBody] UserRegister model)
     {
       // check for existence of user

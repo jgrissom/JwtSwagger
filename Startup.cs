@@ -40,7 +40,14 @@ namespace JwtSwagger
 
             services.AddSwaggerGen(c =>
             {
-                c.SwaggerDoc("v1", new OpenApiInfo { Title = "JwtSwagger", Version = "v1" });
+                //This is to generate the Default UI of Swagger Documentation
+                c.SwaggerDoc("v1", new OpenApiInfo
+                {
+                    Version = "v1",
+                    Title = "Users & Roles API",
+                    Description = "Authentication and Authorization with JWT and Swagger"
+                });
+                c.EnableAnnotations();
             });
         }
 
@@ -50,11 +57,17 @@ namespace JwtSwagger
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
-                app.UseSwagger();
-                app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "JwtSwagger v1"));
             }
 
+            app.UseSwagger();
+            app.UseSwaggerUI(c => {
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "JWT API v1");
+                c.RoutePrefix = "";
+            });
+
             app.UseHttpsRedirection();
+
+            app.UseFileServer();
 
             app.UseRouting();
 
