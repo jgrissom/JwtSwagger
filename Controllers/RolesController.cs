@@ -41,5 +41,22 @@ namespace JWTExample.Controllers
         return StatusCode(StatusCodes.Status500InternalServerError, new { Message = "Failed to create role" });
       return NoContent();
     }
+
+    [HttpDelete("{rolename}")]
+    [SwaggerOperation(summary: "Delete role", null)]
+    [SwaggerResponse(204, "Role deleted", null)]
+    public async Task<IActionResult> Delete([FromRoute] string rolename)
+    {
+      // check for existence of role
+      var role = await _roleManager.FindByNameAsync(rolename);
+      if (role == null)
+        return NotFound(new { Message = "Role Not Found"});
+
+      var result = await _roleManager.DeleteAsync(role);
+      if (!result.Succeeded)
+        return StatusCode(StatusCodes.Status500InternalServerError, new { Message = "Failed to delete role" });
+
+      return NoContent();
+    }
   }
 }
