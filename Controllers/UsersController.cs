@@ -22,12 +22,14 @@ namespace JWTSwagger.Controllers
   {
     // access UserManager w/ dependecy injection
     private readonly UserManager<ApplicationUser> _userManager;
+    private readonly RoleManager<IdentityRole> _roleManager;
     private readonly IConfiguration _configuration;
-    public UsersController(UserManager<ApplicationUser> userManager, IConfiguration configuration)
+    public UsersController(UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager, IConfiguration configuration)
     {
       _userManager = userManager;
+      _roleManager = roleManager;
       _configuration = configuration;
-    }
+     }
 
     [HttpGet]
     [SwaggerOperation(summary: "Return all users", null)]
@@ -62,6 +64,29 @@ namespace JWTSwagger.Controllers
       var result = await _userManager.CreateAsync(user, model.Password);
       if (!result.Succeeded)
         return StatusCode(StatusCodes.Status500InternalServerError);
+
+      return NoContent();
+    }
+
+    [HttpPost]
+    [SwaggerOperation(summary: "Assign user to role", null)]
+    [SwaggerResponse(204, "User assigned to role", null)]
+    [Route("assignrole")]
+    public async Task<IActionResult> AssignUserToRole([FromBody] UserRole model)
+    {
+      // check for existence of user
+      var user = await _userManager.FindByNameAsync(model.Username);
+      if (user == null) 
+        return StatusCode(StatusCodes.Status404NotFound, new { Status = "Error", Message = "User Not Found."});
+
+      // check for existence of role
+      var role = await _roleManager.FindByNameAsync(model.RoleName);
+      if (role == null) 
+        return StatusCode(StatusCodes.Status404NotFound, new { Status = "Error", Message = "Role Not Found."});
+
+      var result = await _userManager.AddToRoleAsync(user, model.RoleName);
+      if (!result.Succeeded)
+        return StatusCode(StatusCodes.Status500InternalServerError, new { Message = "Failed to assign user to role" });
 
       return NoContent();
     }
