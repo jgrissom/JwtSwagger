@@ -6,6 +6,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
 using Microsoft.EntityFrameworkCore;
 using JWTSwagger.Authentication;
+using Microsoft.AspNetCore.Identity;
 
 namespace JwtSwagger
 {
@@ -25,6 +26,17 @@ namespace JwtSwagger
             services.AddControllers();
 
             services.AddDbContext<IdentityContext>(options => options.UseSqlServer(Configuration.GetConnectionString("DefaultSQLServerConnection")));
+
+             // For Identity
+            services.AddIdentity<ApplicationUser, IdentityRole>(opts =>
+            {
+                opts.Password.RequiredLength = 6;
+                opts.Password.RequireNonAlphanumeric = false;
+                opts.Password.RequireLowercase = false;
+                opts.Password.RequireUppercase = false;
+                opts.Password.RequireDigit = false;
+		        opts.User.RequireUniqueEmail = true;
+            }).AddEntityFrameworkStores<IdentityContext>().AddDefaultTokenProviders();
 
             services.AddSwaggerGen(c =>
             {
