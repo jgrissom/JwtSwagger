@@ -1,3 +1,7 @@
+// Repository:  JWTSwagger
+// Author:      Jeff Grissom
+// Version:     2.xx
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
