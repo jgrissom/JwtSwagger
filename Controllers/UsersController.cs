@@ -92,6 +92,29 @@ namespace JWTSwagger.Controllers
     }
 
     [HttpPost]
+    [Route("removerole")]
+    [SwaggerOperation(summary: "Remove user from role", null)]
+    [SwaggerResponse(204, "User removed from role", null)]
+    public async Task<IActionResult> RemoveUserFromRole([FromBody] UserRole model)
+    {
+      // check for existence of user
+      var user = await _userManager.FindByNameAsync(model.Username);
+      if (user == null) 
+        return StatusCode(StatusCodes.Status404NotFound, new { Status = "Error", Message = "User Not Found."});
+
+      // check for existence of role
+      var role = await _roleManager.FindByNameAsync(model.RoleName);
+      if (role == null) 
+        return StatusCode(StatusCodes.Status404NotFound, new { Status = "Error", Message = "Role Not Found."});
+
+      var result = await _userManager.RemoveFromRoleAsync(user, model.RoleName);
+      if (!result.Succeeded)
+        return StatusCode(StatusCodes.Status500InternalServerError, new { Message = "Failed to remove user from role" });
+
+      return NoContent();
+    }
+
+    [HttpPost]
     [Route("login")]
     [SwaggerOperation(summary: "User login", null)]
     [SwaggerResponse(200, "Success", typeof(UserTokenDTO))]
